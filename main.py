@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function //输出函数
 import os
 import argparse
 from glob import glob
