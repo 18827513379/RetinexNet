@@ -31,8 +31,8 @@ def data_augmentation(image, mode):
         return np.flipud(image)
 
 def load_images(file):
-    im = Image.open(file)
-    return np.array(im, dtype="float32") / 255.0
+    im = Image.open(file)//uint8是无符号八位整型，表示范围是[0, 255]的整数,从读入就是uint8
+    return np.array(im, dtype="float32") / 255.0//转换成numpy array处理,进行归一化
 
 def save_images(filepath, result_1, result_2 = None):
     result_1 = np.squeeze(result_1)
