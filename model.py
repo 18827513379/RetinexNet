@@ -10,18 +10,19 @@ import numpy as np
 
 from utils import *
 
-def concat(layers):
-    return tf.concat(layers, axis=3)
+def concat(layers)://矩阵拼接，按第4维度上连，应该是指通道的那个维度（B,W,H,C）
+    return tf.concat(layers, axis=3)//返回一个多维矩阵
 
-def DecomNet(input_im, layer_num, channel=64, kernel_size=3):
-    input_max = tf.reduce_max(input_im, axis=3, keepdims=True)
-    input_im = concat([input_max, input_im])
-    with tf.variable_scope('DecomNet', reuse=tf.AUTO_REUSE):
+def DecomNet(input_im, layer_num, channel=64, kernel_size=3)://定义分解网络，参数有输入，卷积层数量，通道数，卷积核尺寸
+    input_max = tf.reduce_max(input_im, axis=3, keepdims=True)//进行一个通道维度的最大池化（B,W,H,1）
+    input_im = concat([input_max, input_im])//将最大池化的通道与与开始的输入拼接在一起，按第4维度上连  （B,W,H,C）
+    with tf.variable_scope('DecomNet', reuse=tf.AUTO_REUSE)://在一个 variable_scope 作用域下内共享一些变量
+//第一个卷积层提取特征，
         conv = tf.layers.conv2d(input_im, channel, kernel_size * 3, padding='same', activation=None, name="shallow_feature_extraction")
-        for idx in range(layer_num):
+        for idx in range(layer_num)://循环中有5个卷积层，做卷积时为什么要加RELU，这几个层叫激活层？
             conv = tf.layers.conv2d(conv, channel, kernel_size, padding='same', activation=tf.nn.relu, name='activated_layer_%d' % idx)
         conv = tf.layers.conv2d(conv, 4, kernel_size, padding='same', activation=None, name='recon_layer')
-
+//最后一个卷积层，通道数为什么是4，没有用到激活函数，叫重建层？
     R = tf.sigmoid(conv[:,:,:,0:3])
     L = tf.sigmoid(conv[:,:,:,3:4])
 
