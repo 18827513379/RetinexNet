@@ -56,12 +56,12 @@ def lowlight_train(lowlight_enhance)://定义函数：低照度训练，参数�
         train_high_data.append(high_im)
 
     eval_low_data = []
-    eval_high_data = []
+    eval_high_data = []//这个只是定义了，并没有在哪用到？
 
     eval_low_data_name = glob('./data/eval/low/*.*')
 
     for idx in range(len(eval_low_data_name)):
-        eval_low_im = load_images(eval_low_data_name[idx])//为什么要加 eval_low_im，也加入训练呢？
+        eval_low_im = load_images(eval_low_data_name[idx])//为什么要加 eval_low_data，也加入训练呢？
         eval_low_data.append(eval_low_im)
 //os.path.join(path1[,path2[,......]]),将多个路径组合后返回,这里的decome和relight是用来干嘛的
     lowlight_enhance.train(train_low_data, train_high_data, eval_low_data, batch_size=args.batch_size, patch_size=args.patch_size, 
@@ -73,23 +73,23 @@ def lowlight_train(lowlight_enhance)://定义函数：低照度训练，参数�
                            eval_every_epoch=args.eval_every_epoch, train_phase="Relight")
 
 
-def lowlight_test(lowlight_enhance):
+def lowlight_test(lowlight_enhance):注意形参是什么
     if args.test_dir == None:
         print("[!] please provide --test_dir")
         exit(0)
 
-    if not os.path.exists(args.save_dir):
+    if not os.path.exists(args.save_dir)://存储测试的目录
         os.makedirs(args.save_dir)
 
     test_low_data_name = glob(os.path.join(args.test_dir) + '/*.*')
     test_low_data = []
-    test_high_data = []
+    test_high_data = []//引入测试的图片，为什么要引入正常的图片？
     for idx in range(len(test_low_data_name)):
         test_low_im = load_images(test_low_data_name[idx])
-        test_low_data.append(test_low_im)
+        test_low_data.append(test_low_im) //构造测试低光照图片的矩阵
 
     lowlight_enhance.test(test_low_data, test_high_data, test_low_data_name, save_dir=args.save_dir, decom_flag=args.decom)
-
+//类 lowlight_enhance里定义的test函数，测试图片，分解时
 
 def main(_):
     if args.use_gpu:
@@ -99,9 +99,9 @@ def main(_):
         with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
             model = lowlight_enhance(sess)
             if args.phase == 'train':
-                lowlight_train(model)
+                lowlight_train(model)//训练模型，注意形参
             elif args.phase == 'test':
-                lowlight_test(model)
+                lowlight_test(model)//测试模型
             else:
                 print('[!] Unknown phase')
                 exit(0)
